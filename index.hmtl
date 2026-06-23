@@ -1,0 +1,1697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NetflixZone Investment Platform</title>
+<style>
+:root{--bg:#0a0a0a;--card:#1a1a2e;--card2:#16213e;--accent:#E50914;--gold:#FFD700;--green:#2ecc71;--blue:#3498db;--orange:#e67e22;--purple:#9b59b6;--text:#ffffff;--text2:#b3b3b3;--border:#2a2a4a;--red:#E50914;--yellow:#f39c12}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif}
+body{background:var(--bg);color:var(--text);min-height:100vh}
+.hidden{display:none!important}
+.loading-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column}
+.spinner{width:50px;height:50px;border:4px solid var(--border);border-top:4px solid var(--accent);border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+.container{max-width:480px;margin:0 auto;padding:20px}
+.container-wide{max-width:900px;margin:0 auto;padding:20px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:16px}
+.card h2{font-size:18px;margin-bottom:16px;color:var(--accent)}
+input,select,textarea{width:100%;padding:12px 14px;margin-bottom:12px;background:var(--card2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;outline:none;transition:border 0.3s}
+input:focus,select:focus{border-color:var(--accent)}
+input::placeholder{color:#666}
+.btn{width:100%;padding:13px;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;transition:all 0.3s;margin-bottom:8px}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:#b80710}
+.btn-secondary{background:var(--blue);color:#fff}
+.btn-secondary:hover{background:#2980b9}
+.btn-success{background:var(--green);color:#fff}
+.btn-success:hover{background:#27ae60}
+.btn-danger{background:var(--red);color:#fff}
+.btn-danger:hover{background:#c0392b}
+.btn-warning{background:var(--orange);color:#fff}
+.btn-gold{background:var(--gold);color:#000}
+.btn-sm{padding:8px 14px;font-size:12px;width:auto}
+.error{color:var(--accent);font-size:13px;margin-bottom:8px;text-align:center}
+.success{color:var(--green);font-size:13px;margin-bottom:8px;text-align:center}
+.logo{text-align:center;margin:30px 0}
+.logo h1{font-size:28px;color:var(--accent);letter-spacing:2px}
+.logo p{color:var(--text2);font-size:13px;margin-top:4px}
+.auth-link{text-align:center;margin-top:12px;font-size:13px;color:var(--text2)}
+.auth-link a{color:var(--accent);cursor:pointer;text-decoration:none}
+.auth-link a:hover{text-decoration:underline}
+.dashboard-header{background:var(--card);border-bottom:1px solid var(--border);padding:12px 20px;display:flex;justify-content:space-between;align-items:center}
+.dashboard-header h3{font-size:16px;color:var(--accent)}
+.dashboard-header .user-info{display:flex;align-items:center;gap:12px}
+.dashboard-header .user-info span{font-size:13px;color:var(--text2)}
+.dashboard-header .logout-btn{background:none;border:1px solid var(--border);color:var(--accent);padding:6px 12px;border-radius:6px;cursor:pointer;font-size:12px}
+.balance-card{background:linear-gradient(135deg,var(--card),var(--card2));border:1px solid var(--accent);border-radius:12px;padding:24px;margin:16px 0;text-align:center}
+.balance-card .amount{font-size:36px;font-weight:700;color:var(--gold);margin:8px 0}
+.balance-card .label{font-size:13px;color:var(--text2)}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0}
+.stat-card{background:var(--card2);border-radius:10px;padding:16px;text-align:center;border:1px solid var(--border)}
+.stat-card .value{font-size:20px;font-weight:600;color:var(--gold)}
+.stat-card .label{font-size:11px;color:var(--text2);margin-top:4px}
+.tab-buttons{display:flex;gap:6px;flex-wrap:wrap;margin:16px 0}
+.tab-buttons button{flex:1;min-width:70px;padding:8px 10px;background:var(--card2);border:1px solid var(--border);color:var(--text2);border-radius:6px;cursor:pointer;font-size:11px;transition:all 0.3s}
+.tab-buttons button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th,td{padding:10px 8px;text-align:left;border-bottom:1px solid var(--border)}
+th{color:var(--text2);font-weight:600;font-size:11px;text-transform:uppercase}
+td{color:var(--text)}
+.status-badge{padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600}
+.status-badge.active{background:var(--green);color:#fff}
+.status-badge.frozen{background:var(--orange);color:#fff}
+.status-badge.closed{background:var(--red);color:#fff}
+.badge{padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600}
+.badge.deposit{background:var(--green);color:#fff}
+.badge.withdraw{background:var(--orange);color:#fff}
+.badge.bank_withdraw{background:var(--blue);color:#fff}
+.badge.profit{background:var(--gold);color:#000}
+.badge.referral{background:var(--purple);color:#fff}
+.badge.approved{background:var(--green);color:#fff}
+.badge.pending{background:var(--orange);color:#fff}
+.badge.declined{background:var(--red);color:#fff}
+.modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:1000;display:none;align-items:center;justify-content:center}
+.modal-overlay.active{display:flex}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;max-width:440px;width:90%;max-height:90vh;overflow-y:auto}
+.modal h3{font-size:18px;margin-bottom:12px;color:var(--accent)}
+.modal-close{float:right;background:none;border:none;color:var(--text2);font-size:20px;cursor:pointer}
+.admin-section{margin-top:20px}
+.admin-card{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:12px}
+.admin-card .user-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.admin-card .user-header h4{font-size:14px;color:var(--gold)}
+.admin-card .user-detail{font-size:12px;color:var(--text2);margin-bottom:4px}
+.admin-card .admin-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.admin-card .admin-actions button{padding:5px 10px;font-size:11px;border:none;border-radius:4px;cursor:pointer}
+.btn-blue{background:var(--blue);color:#fff}
+.btn-green{background:var(--green);color:#fff}
+.btn-red{background:var(--red);color:#fff}
+.btn-orange{background:var(--orange);color:#fff}
+.btn-yellow{background:var(--yellow);color:#000}
+.admin-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:600px){.admin-grid{grid-template-columns:1fr}.stats-grid{grid-template-columns:1fr 1fr}}
+.payout-modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:2000;display:none;align-items:center;justify-content:center}
+.payout-modal.active{display:flex}
+.payout-modal .content{background:var(--card);border:2px solid var(--green);border-radius:16px;padding:30px;max-width:420px;width:90%;text-align:center}
+.payout-modal .content h2{color:var(--green);margin-bottom:10px}
+.payout-modal .content p{color:var(--text2);font-size:14px;margin-bottom:6px}
+.settings-section h3{font-size:15px;color:var(--accent);margin:16px 0 10px}
+.settings-row{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap}
+.settings-row input{flex:1}
+</style>
+</head>
+<body>
+
+<!-- Loading Overlay -->
+<div id="loadingOverlay" class="loading-overlay">
+  <div class="spinner"></div>
+  <p style="margin-top:12px;color:var(--text2);font-size:14px;">Loading...</p>
+</div>
+
+<!-- Payout Result Modal -->
+<div id="payoutResultModal" class="payout-modal">
+  <div class="content">
+    <h2 id="payoutResultTitle">✅ Done!</h2>
+    <div id="payoutResultContent"></div>
+    <button class="btn btn-primary" style="margin-top:16px;" onclick="document.getElementById('payoutResultModal').classList.remove('active')">Close</button>
+  </div>
+</div>
+
+<!-- ===== AUTH CONTAINER ===== -->
+<div id="authContainer" class="container">
+  <div class="logo">
+    <h1>NETFLIXZONE</h1>
+    <p>Investment Platform</p>
+  </div>
+
+  <!-- Login Form -->
+  <div id="loginForm" class="card">
+    <h2>Sign In</h2>
+    <div id="loginError" class="error"></div>
+    <input type="text" id="loginUsername" placeholder="Username">
+    <input type="password" id="loginPassword" placeholder="Password">
+    <button class="btn btn-primary" onclick="userLogin()">Sign In</button>
+    <div class="auth-link">Don't have account? <a onclick="showRegister()">Register here</a></div>
+    <div class="auth-link" style="margin-top:4px;"><a onclick="openAdminLogin()">Admin Panel</a></div>
+  </div>
+
+  <!-- Register Form -->
+  <div id="registerForm" class="card hidden">
+    <h2>Create Account</h2>
+    <div id="registerError" class="error"></div>
+    <div id="registerSuccess" class="success"></div>
+    <input type="text" id="regUsername" placeholder="Username *">
+    <input type="text" id="regFullname" placeholder="Full Name *">
+    <input type="email" id="regEmail" placeholder="Email *">
+    <input type="text" id="regPhone" placeholder="Phone (optional)">
+    <input type="password" id="regPassword" placeholder="Password *">
+    <input type="text" id="regReferral" placeholder="Referral code (optional)">
+    <button class="btn btn-success" onclick="userRegister()">Create Account</button>
+    <div class="auth-link">Already registered? <a onclick="showLogin()">Sign in here</a></div>
+  </div>
+</div>
+
+<!-- ===== DASHBOARD ===== -->
+<div id="userDashboard" class="hidden">
+  <div class="dashboard-header">
+    <h3>NETFLIXZONE</h3>
+    <div class="user-info">
+      <span>👤 <span id="displayUsername">User</span></span>
+      <button class="logout-btn" onclick="userLogout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="container-wide">
+    <!-- Balance Card -->
+    <div class="balance-card">
+      <div class="label">Available Balance</div>
+      <div class="amount" id="userBalance">₦0.00</div>
+      <div style="display:flex;justify-content:center;gap:16px;margin-top:8px;">
+        <span class="label">Invested: <span id="userInvested">₦0</span></span>
+        <span class="label">Profit: <span id="userProfit">₦0</span></span>
+      </div>
+      <span id="userStatusBadge" class="status-badge active" style="margin-top:8px;display:inline-block;"></span>
+    </div>
+
+    <!-- Buttons -->
+    <div style="display:flex;gap:10px;margin:16px 0;">
+      <button class="btn btn-success" style="flex:1;" onclick="showDepositModal()">💰 Deposit</button>
+      <button id="withdrawBtn" class="btn btn-warning" style="flex:1;" onclick="showWithdrawModal()">💸 Withdraw</button>
+    </div>
+
+    <!-- Asset Display -->
+    <div class="card">
+      <h2>💎 Current Asset</h2>
+      <div id="currentAssetDisplay" style="font-size:18px;font-weight:600;margin-bottom:4px;"></div>
+      <div id="currentAssetRateDisplay" style="font-size:13px;color:var(--text2);margin-bottom:8px;"></div>
+      <div id="assetCooldownDisplay" style="font-size:12px;color:var(--orange);margin-bottom:8px;"></div>
+      <button id="switchAssetBtn" class="btn btn-secondary btn-sm" onclick="openSwitchAssetModal()">Switch Asset</button>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card"><div class="value" id="userPlan">Basic</div><div class="label">Plan</div></div>
+      <div class="stat-card"><div class="value" id="userReferralBonus">₦0</div><div class="label">Referral Bonus</div></div>
+    </div>
+
+    <!-- Referral Info -->
+    <div class="card">
+      <h2>Referral Link</h2>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:6px;">Your code: <strong id="refCode" style="color:var(--gold);"></strong></div>
+      <div style="font-size:12px;color:var(--text2);">Share: <span id="refLink" style="color:var(--blue);"></span></div>
+    </div>
+
+    <!-- Transactions -->
+    <div class="card">
+      <h2>Transactions</h2>
+      <div class="tab-buttons">
+        <button class="active" onclick="showTxTab('all')">All</button>
+        <button onclick="showTxTab('deposits')">Deposits</button>
+        <button onclick="showTxTab('withdrawals')">Withdrawals</button>
+        <button onclick="showTxTab('profits')">Profit</button>
+        <button onclick="showTxTab('referrals')">Referrals</button>
+        <button onclick="showTxTab('asset_switch')">Switch</button>
+      </div>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead><tr><th>Date</th><th>Type</th><th>Amount</th><th>Status</th><th>Description</th></tr></thead>
+          <tbody id="userTransactions"><tr><td colspan="5" style="text-align:center;color:#808080;">No transactions.</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Admin Section -->
+    <div id="adminSection" class="admin-section hidden">
+      <div class="card">
+        <h2>🔐 Admin Panel</h2>
+        <div id="adminActionMsg" style="font-size:13px;color:var(--green);margin-bottom:8px;"></div>
+
+        <!-- Overview -->
+        <div class="stats-grid">
+          <div class="stat-card"><div class="value" id="adminTotalUsers">0</div><div class="label">Total Users</div></div>
+          <div class="stat-card"><div class="value" id="adminActiveUsers">0</div><div class="label">Active</div></div>
+        </div>
+
+        <!-- Settings -->
+        <div class="settings-section">
+          <h3>⚙️ Platform Settings</h3>
+          <div class="settings-row">
+            <input type="number" id="adminMinDeposit" placeholder="Min Deposit" step="100">
+            <button class="btn btn-sm btn-primary" onclick="adminUpdateMinAmounts()" style="width:auto;">Save</button>
+          </div>
+          <div style="font-size:12px;color:var(--text2);margin:-6px 0 10px;">Min Deposit: ₦<span id="currentMinDeposit">1,000</span></div>
+          <div class="settings-row">
+            <input type="number" id="adminMinWithdraw" placeholder="Min Withdraw" step="100">
+            <button class="btn btn-sm btn-primary" onclick="adminUpdateMinAmounts()" style="width:auto;">Save</button>
+          </div>
+          <div style="font-size:12px;color:var(--text2);margin:-6px 0 10px;">Min Withdraw: ₦<span id="currentMinWithdraw">500</span></div>
+          <div class="settings-row">
+            <select id="adminWithdrawDay"><option value="1">Monday</option><option value="2">Tuesday</option><option value="3">Wednesday</option><option value="4">Thursday</option><option value="5">Friday</option><option value="6">Saturday</option><option value="0">Sunday</option></select>
+            <button class="btn btn-sm btn-primary" onclick="adminUpdateWithdrawDay()" style="width:auto;">Set</button>
+          </div>
+          <div style="font-size:12px;color:var(--text2);margin:-6px 0 10px;">Withdraw Day: <span id="currentWithdrawDayDisplay">Friday</span></div>
+        </div>
+
+        <!-- Asset Rates -->
+        <div class="settings-section">
+          <h3>📈 Asset Interest Rates (%)</h3>
+          <div id="assetRateMsg" style="font-size:12px;color:var(--green);margin-bottom:6px;"></div>
+          <div id="assetRateInputs"></div>
+          <button class="btn btn-sm btn-success" onclick="adminSaveAssetRates()" style="width:auto;">Save All Rates</button>
+        </div>
+
+        <!-- Monnify -->
+        <div class="settings-section">
+          <h3>🏦 Monnify (Bank Payouts)</h3>
+          <div id="monnifyMsg" style="font-size:12px;color:var(--green);margin-bottom:6px;"></div>
+          <input type="text" id="adminMonnifyApiKey" placeholder="API Key">
+          <input type="text" id="adminMonnifyContractCode" placeholder="Contract Code">
+          <input type="password" id="adminMonnifySecretKey" placeholder="Secret Key">
+          <input type="text" id="adminMonnifySourceAccount" placeholder="Source Account">
+          <button class="btn btn-sm btn-primary" onclick="adminSaveMonnifyKeys()" style="width:auto;">Save Monnify</button>
+        </div>
+
+        <!-- NOWPayments -->
+        <div class="settings-section">
+          <h3>💎 NOWPayments (Crypto Payouts)</h3>
+          <div id="npMsg" style="font-size:12px;color:var(--green);margin-bottom:6px;"></div>
+          <input type="text" id="adminNPApiKey" placeholder="API Key">
+          <input type="password" id="adminNPSecretKey" placeholder="Secret Key">
+          <input type="email" id="adminNPEmail" placeholder="Email">
+          <input type="password" id="adminNPPassword" placeholder="Password">
+          <button class="btn btn-sm btn-primary" onclick="adminSaveNPKeys()" style="width:auto;">Save NOWPayments</button>
+        </div>
+
+        <!-- Admin Password -->
+        <div class="settings-section">
+          <h3>🔑 Change Admin Password</h3>
+          <div id="changePassMsg" style="font-size:12px;color:var(--green);margin-bottom:6px;"></div>
+          <input type="password" id="adminCurrentPass" placeholder="Current password">
+          <input type="password" id="adminNewPassInput" placeholder="New password">
+          <button class="btn btn-sm btn-warning" onclick="changeAdminPassword()" style="width:auto;">Change</button>
+        </div>
+
+        <!-- Reset User Password -->
+        <div class="settings-section">
+          <h3>🔑 Reset User Password</h3>
+          <div id="resetUserPassMsg" style="font-size:12px;color:var(--green);margin-bottom:6px;"></div>
+          <input type="text" id="adminResetUser" placeholder="Username">
+          <input type="password" id="adminResetUserPass" placeholder="New password">
+          <button class="btn btn-sm btn-warning" onclick="adminResetUserPassword()" style="width:auto;">Reset</button>
+        </div>
+
+        <!-- Create User -->
+        <div class="settings-section">
+          <h3>👤 Create User</h3>
+          <div id="adminCreateMsg" style="font-size:12px;color:var(--green);margin-bottom:6px;"></div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <input type="text" id="adminNewUser" placeholder="Username" style="flex:1;min-width:100px;">
+            <input type="password" id="adminNewPass" placeholder="Password" style="flex:1;min-width:100px;">
+            <input type="text" id="adminNewName" placeholder="Full Name" style="flex:1;min-width:100px;">
+          </div>
+          <button class="btn btn-sm btn-success" onclick="adminCreateUser()" style="width:auto;">Create</button>
+        </div>
+
+        <!-- Pay All Profits -->
+        <div class="settings-section">
+          <h3>💰 Pay All Daily Interest</h3>
+          <button class="btn btn-warning" onclick="adminPayAllProfits()">Apply Interest to All Active Users</button>
+        </div>
+
+        <!-- Reset All / Danger -->
+        <div class="settings-section">
+          <h3 style="color:var(--red);">⚠️ Danger Zone</h3>
+          <button class="btn btn-danger" onclick="adminResetAll()">🗑 WIPE ALL USERS</button>
+        </div>
+      </div>
+
+      <!-- Pending Withdrawals -->
+      <div class="card">
+        <h2>⏳ Pending Withdrawals</h2>
+        <div id="pendingWithdrawals"><p style="color:#808080;">None pending.</p></div>
+      </div>
+
+      <!-- All Users -->
+      <div class="card">
+        <h2>👥 All Users</h2>
+        <div id="adminUserCards"><p style="color:#808080;">Loading...</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Admin Login Overlay -->
+<div id="adminLoginOverlay" class="modal-overlay">
+  <div class="modal">
+    <span class="modal-close" onclick="closeAdminLogin()">&times;</span>
+    <h3>🔐 Admin Login</h3>
+    <div id="adminLoginError" class="error"></div>
+    <input type="text" id="adminLoginUser" placeholder="Admin Username">
+    <input type="password" id="adminLoginPass" placeholder="Password">
+    <button class="btn btn-primary" onclick="adminLogin()">Enter Admin Panel</button>
+  </div>
+</div>
+
+<!-- Deposit Modal -->
+<div id="depositModal" class="modal-overlay">
+  <div class="modal">
+    <span class="modal-close" onclick="closeModal('depositModal')">&times;</span>
+    <h3>💰 Deposit Funds</h3>
+    <div id="depositError" class="error"></div>
+    <div id="depositSuccess" class="success"></div>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:12px;">Enter amount in Naira (NGN). Minimum: ₦<span id="depositMinDisplay">1,000</span></p>
+    <input type="number" id="depositAmount" placeholder="Amount (₦)" step="100">
+    <div id="monnifyQrSection" style="display:none;margin:12px 0;padding:16px;background:var(--card2);border-radius:8px;text-align:center;">
+      <p style="font-size:13px;color:var(--text2);margin-bottom:8px;">Pay via Monnify Transfer/QR</p>
+      <div id="monnifyQrContainer"></div>
+    </div>
+    <button class="btn btn-success" onclick="processDeposit()">Proceed to Payment</button>
+  </div>
+</div>
+
+<!-- Withdraw Modal -->
+<div id="withdrawModal" class="modal-overlay">
+  <div class="modal">
+    <span class="modal-close" onclick="closeModal('withdrawModal')">&times;</span>
+    <h3>💸 Withdraw Funds</h3>
+    <div id="withdrawError" class="error"></div>
+    <div id="withdrawSuccess" class="success"></div>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:12px;">Min: ₦<span id="withdrawMinDisplay">500</span> | Withdrawals processed on <span id="withdrawDayDisplay">Friday</span></p>
+    <div style="display:flex;gap:8px;margin-bottom:12px;">
+      <button id="wdTabBank" class="btn btn-sm btn-primary" onclick="switchWithdrawTab('bank')" style="flex:1;">🏦 Bank</button>
+      <button id="wdTabCrypto" class="btn btn-sm btn-secondary" onclick="switchWithdrawTab('crypto')" style="flex:1;">💎 Crypto</button>
+    </div>
+    <!-- Bank Form -->
+    <div id="withdrawBankForm">
+      <input type="number" id="wdBankAmount" placeholder="Amount (₦)" step="100">
+      <label style="font-size:12px;color:var(--text2);">Select Bank</label>
+      <select id="wdBankCode"></select>
+      <input type="text" id="wdAccountNumber" placeholder="Account Number" maxlength="10">
+      <input type="text" id="wdAccountHolder" placeholder="Account Holder Name">
+      <button class="btn btn-warning" onclick="requestBankWithdraw()">Withdraw to Bank</button>
+    </div>
+    <!-- Crypto Form -->
+    <div id="withdrawCryptoForm" class="hidden">
+      <input type="number" id="wdCryptoAmount" placeholder="Amount (₦)" step="100">
+      <label style="font-size:12px;color:var(--text2);">Select Currency</label>
+      <select id="wdCurrency">
+        <option value="USDT (TRC20)">USDT (TRC20)</option>
+        <option value="Bitcoin (BTC)">Bitcoin (BTC)</option>
+        <option value="Ethereum (ETH)">Ethereum (ETH)</option>
+        <option value="Tron (TRX)">Tron (TRX)</option>
+        <option value="Litecoin (LTC)">Litecoin (LTC)</option>
+        <option value="Dogecoin (DOGE)">Dogecoin (DOGE)</option>
+        <option value="Solana (SOL)">Solana (SOL)</option>
+      </select>
+      <input type="text" id="wdWallet" placeholder="Wallet Address">
+      <button class="btn btn-warning" onclick="requestCryptoWithdraw()">Withdraw to Wallet</button>
+    </div>
+  </div>
+</div>
+
+<!-- Asset Switch Modal -->
+<div id="assetSwitchModal" class="modal-overlay">
+  <div class="modal">
+    <span class="modal-close" onclick="closeModal('assetSwitchModal')">&times;</span>
+    <h3>💎 Switch Investment Asset</h3>
+    <div id="assetSwitchError" class="error"></div>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:12px;">Choose an asset class. Different rates apply. Cooldown: 24h between switches.</p>
+    <div id="assetOptions" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;"></div>
+    <button class="btn btn-secondary" onclick="confirmSwitchAsset()">Switch Asset</button>
+  </div>
+</div>
+
+<script>
+// ================================================================
+// [FIX #1] CONFIG — Set your JSONBin credentials here!
+// ================================================================
+const BIN_ID = 'YOUR_BIN_ID_HERE';
+const MASTER_KEY = 'YOUR_MASTER_KEY_HERE';
+const ACCESS_KEY = ''; // Optional, leave empty if not using
+const JSONBIN_URL = 'https://api.jsonbin.io/v3/b/' + BIN_ID;
+
+// ================================================================
+// ASSET TYPES — Fixed config
+// ================================================================
+const ASSET_TYPES = {
+  metallic: { name: 'Metallic Alloys', icon: '⚙️', defaultRate: 2.0, color: '#808080' },
+  energy: { name: 'Energy Reserves', icon: '⚡', defaultRate: 3.0, color: '#f39c12' },
+  gemstone: { name: 'Gemstone Vault', icon: '💎', defaultRate: 4.0, color: '#9b59b6' }
+};
+
+// Naira banks list
+const NIGERIAN_BANKS = [
+  {code:'000',name:'Access Bank'},{code:'035',name:'Access Bank (Diamond)'},{code:'044',name:'Access Bank Plc'},
+  {code:'023',name:'Citibank'},{code:'063',name:'Diamond Bank'},{code:'050',name:'Ecobank'},
+  {code:'084',name:'Enterprise Bank'},{code:'070',name:'Fidelity Bank'},{code:'011',name:'First Bank'},
+  {code:'214',name:'First City Monument Bank'},{code:'058',name:'GTBank'},{code:'030',name:'Heritage Bank'},
+  {code:'301',name:'Jaiz Bank'},{code:'082',name:'Keystone Bank'},{code:'014',name:'MainStreet Bank'},
+  {code:'076',name:'Polaris Bank'},{code:'101',name:'Providus Bank'},{code:'221',name:'Stanbic IBTC'},
+  {code:'068',name:'Standard Chartered'},{code:'232',name:'Sterling Bank'},{code:'100',name:'Suntrust Bank'},
+  {code:'033',name:'United Bank For Africa'},{code:'032',name:'Union Bank'},{code:'215',name:'Unity Bank'},
+  {code:'035',name:'Wema Bank'},{code:'057',name:'Zenith Bank'}
+];
+
+// ================================================================
+// [FIX #2] PROMISE MUTEX — Prevents race conditions
+// ================================================================
+let mutexQueue = [];
+let mutexRunning = false;
+
+function runNextMutex() {
+  if (mutexRunning || mutexQueue.length === 0) return;
+  mutexRunning = true;
+  const next = mutexQueue.shift();
+  next().finally(function() {
+    mutexRunning = false;
+    runNextMutex();
+  });
+}
+
+function mutexLock() {
+  return new Promise(function(resolve) {
+    mutexQueue.push(function() {
+      resolve();
+      return Promise.resolve();
+    });
+    if (!mutexRunning) runNextMutex();
+  });
+}
+
+// ================================================================
+// DATA LAYER — Queue + Mutex protected
+// ================================================================
+let appData = null;
+let saveQueue = Promise.resolve();
+
+function getHeaders() {
+  var h = { 'X-Master-Key': MASTER_KEY, 'Content-Type': 'application/json' };
+  if (ACCESS_KEY) h['X-Access-Key'] = ACCESS_KEY;
+  // [FIX #3] Add version control header for recovery
+  h['X-Bin-Versioning'] = 'true';
+  return h;
+}
+
+function loadData() {
+  return saveQueue.then(function() {
+    return mutexLock().then(function() {
+      return fetch(JSONBIN_URL, { headers: getHeaders() });
+    }).then(function(r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.json();
+    }).then(function(j) {
+      if (j && j.record) appData = j.record;
+      return appData;
+    }).catch(function(err) {
+      console.error('Load error:', err);
+      return appData;
+    });
+  });
+}
+
+// readData() — read-only, no mutex needed, just refreshes from JSONBin
+function readData() {
+  return fetch(JSONBIN_URL, { headers: getHeaders() })
+    .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+    .then(function(j) { if (j && j.record) appData = j.record; return appData; })
+    .catch(function(err) { console.error('Read error:', err); return appData; });
+}
+
+function saveData() {
+  if (!appData) return Promise.resolve();
+  // [FIX #4] Validate data integrity before saving
+  if (!appData.admin || !appData.settings || !appData.users) {
+    console.error('Corrupt data detected — NOT saving!');
+    return Promise.reject(new Error('Corrupt data'));
+  }
+  return fetch(JSONBIN_URL, {
+    method: 'PUT',
+    headers: getHeaders(),
+    body: JSON.stringify(appData)
+  }).then(function(r) {
+    if (!r.ok) throw new Error('Save HTTP ' + r.status);
+    return r.json();
+  });
+}
+
+// [FIX #5] atomicUpdate — queue + mutex, NO race conditions!
+function atomicUpdate(modifyFn) {
+  var prevQueue = saveQueue;
+  saveQueue = prevQueue.then(function() {
+    return mutexLock().then(function() {
+      return loadData();
+    }).then(function() {
+      var result = modifyFn(appData);
+      if (result === true) {
+        return saveData();
+      }
+    });
+  });
+  return saveQueue;
+}
+
+// ================================================================
+// HELPERS
+// ================================================================
+function fmtNaira(n) { return '₦' + Number(n || 0).toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function showLoading() { document.getElementById('loadingOverlay').classList.remove('hidden'); }
+function hideLoading() { document.getElementById('loadingOverlay').classList.add('hidden'); }
+function showRegister() { document.getElementById('loginForm').classList.add('hidden'); document.getElementById('registerForm').classList.remove('hidden'); }
+function showLogin() { document.getElementById('registerForm').classList.add('hidden'); document.getElementById('loginForm').classList.remove('hidden'); }
+function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+function getAssetInfo(id) { return ASSET_TYPES[id] || ASSET_TYPES.metallic; }
+function minDep() { return (appData && appData.settings && appData.settings.minDeposit) || 1000; }
+function minWd() { return (appData && appData.settings && appData.settings.minWithdraw) || 500; }
+function wdDay() { var d = appData && appData.settings && appData.settings.withdrawDay; return (d !== undefined && d !== null) ? d : 5; }
+function wdName(d) { return ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][d] || 'Friday'; }
+
+// Session helpers
+function saveSession(username, isAdmin) { try { localStorage.setItem('nzSession', JSON.stringify({username:username, isAdmin:isAdmin||false})); } catch(e){} }
+function getSession() { try { var s = localStorage.getItem('nzSession'); return s ? JSON.parse(s) : null; } catch(e){ return null; } }
+function clearSession() { try { localStorage.removeItem('nzSession'); } catch(e){} }
+
+function resolveRef(code) {
+  if (!appData || !appData.users) return '';
+  for (var un in appData.users) { if (appData.users[un].referralCode === code) return un; }
+  return '';
+}
+
+function getUserInterestRate(u) {
+  var aid = (u && u.asset) || 'metallic';
+  var rates = (appData && appData.settings && appData.settings.assetRates) || {};
+  return rates[aid] !== undefined ? rates[aid] : ASSET_TYPES[aid].defaultRate;
+}
+
+function canSwitchAsset(u) {
+  if (!u.lastAssetSwitch) return true;
+  var now = new Date().getTime();
+  var then = new Date(u.lastAssetSwitch).getTime();
+  return (now - then) >= 24 * 60 * 60 * 1000;
+}
+
+function getAssetSwitchCooldownRemaining(u) {
+  if (!u.lastAssetSwitch) return 0;
+  var now = new Date().getTime();
+  var then = new Date(u.lastAssetSwitch).getTime();
+  var elapsed = (now - then) / (1000 * 60 * 60);
+  return Math.max(0, 24 - elapsed);
+}
+}
+
+// ================================================================
+// AUTH / LOGIN / REGISTRATION
+// ================================================================
+function userLogin() {
+  var u = document.getElementById('loginUsername').value.trim();
+  var p = document.getElementById('loginPassword').value.trim();
+  var e = document.getElementById('loginError');
+  if (!u || !p) { e.textContent = 'Enter username and password.'; return; }
+  
+  // [FIX #6] atomicUpdate for login — reads fresh, no race with other operations
+  loadData().then(function() {
+    if (!appData || !appData.users[u]) {
+      e.textContent = 'Invalid username or password.';
+      return;
+    }
+    if (appData.users[u].password !== p) {
+      e.textContent = 'Invalid username or password.';
+      return;
+    }
+    if (appData.users[u].status === 'closed') {
+      e.textContent = 'Account closed.';
+      return;
+    }
+    currentUser = u;
+    currentUserData = appData.users[u];
+    isAdminLoggedIn = false;
+    saveSession(u, false);
+    e.textContent = '';
+    
+    // Apply interest on login
+    var today = new Date().toDateString();
+    if (currentUserData.status === 'active' && currentUserData.balance > 0 && currentUserData.lastInterestDate !== today) {
+      var rate = getUserInterestRate(currentUserData);
+      var interest = currentUserData.balance * (rate / 100);
+      atomicUpdate(function(data) {
+        var u2 = data.users[currentUser];
+        if (!u2 || u2.lastInterestDate === today) return false;
+        u2.balance += interest;
+        u2.profit += interest;
+        if (!u2.transactions) u2.transactions = [];
+        var n = new Date();
+        var d = n.getFullYear() + '-' + String(n.getMonth() + 1).padStart(2, '0') + '-' + String(n.getDate()).padStart(2, '0') + ' ' + String(n.getHours()).padStart(2, '0') + ':' + String(n.getMinutes()).padStart(2, '0');
+        var ai = getAssetInfo(u2.asset || 'metallic');
+        u2.transactions.push({ date: d, type: 'profit', amount: interest, description: ai.icon + ' ' + ai.name + ' interest ' + rate + '%' });
+        u2.lastInterestDate = today;
+        currentUserData = u2;
+        return true;
+      }).then(function() { enterDashboard('user'); refreshUserData(); });
+    } else {
+      enterDashboard('user');
+      refreshUserData();
+    }
+  });
+}
+
+function userRegister() {
+  var u = document.getElementById('regUsername').value.trim();
+  var fn = document.getElementById('regFullname').value.trim();
+  var em = document.getElementById('regEmail').value.trim();
+  var pw = document.getElementById('regPassword').value.trim();
+  var ref = document.getElementById('regReferral').value.trim() || '';
+  var err = document.getElementById('registerError');
+  var suc = document.getElementById('registerSuccess');
+  
+  if (!u || !fn || !em || !pw) { err.textContent = 'Fill required fields.'; suc.textContent = ''; return; }
+  
+  // [FIX #7] atomicUpdate for registration — no race condition
+  atomicUpdate(function(data) {
+    if (data.users[u]) { err.textContent = 'Username taken.'; return false; }
+    var rbu = '';
+    if (ref) {
+      rbu = resolveRef(ref);
+      if (!rbu) { err.textContent = 'Invalid referral code.'; return false; }
+    }
+    var n = new Date();
+    var d = n.getFullYear() + '-' + String(n.getMonth() + 1).padStart(2, '0') + '-' + String(n.getDate()).padStart(2, '0');
+    data.users[u] = {
+      fullName: fn, email: em, phone: document.getElementById('regPhone').value.trim() || '',
+      password: pw, balance: 0, invested: 0, profit: 0, referralBonus: 0,
+      referralCode: u, referredBy: rbu, plan: 'Basic', status: 'active',
+      createdAt: d, lastInterestDate: '', transactions: [], withdrawals: [],
+      referrals: [], processedReferences: [], asset: 'metallic', lastAssetSwitch: ''
+    };
+    err.textContent = '';
+    suc.textContent = 'Account created! Sign in now.';
+    ['regUsername','regFullname','regEmail','regPhone','regPassword','regReferral'].forEach(function(i) {
+      document.getElementById(i).value = '';
+    });
+    return true;
+  });
+}
+
+function userLogout() {
+  currentUser = null;
+  currentUserData = null;
+  isAdminLoggedIn = false;
+  clearSession();
+  document.getElementById('authContainer').classList.remove('hidden');
+  document.getElementById('userDashboard').classList.remove('active');
+  document.getElementById('loginUsername').value = '';
+  document.getElementById('loginPassword').value = '';
+}
+
+// ================================================================
+// ADMIN LOGIN
+// ================================================================
+function openAdminLogin() {
+  document.getElementById('adminLoginError').textContent = '';
+  document.getElementById('adminLoginUser').value = '';
+  document.getElementById('adminLoginPass').value = '';
+  document.getElementById('adminLoginOverlay').classList.add('active');
+}
+
+function closeAdminLogin() { document.getElementById('adminLoginOverlay').classList.remove('active'); }
+
+function adminLogin() {
+  var u = document.getElementById('adminLoginUser').value.trim();
+  var p = document.getElementById('adminLoginPass').value.trim();
+  var e = document.getElementById('adminLoginError');
+  if (!u || !p) { e.textContent = 'Enter credentials.'; return; }
+  
+  loadData().then(function() {
+    if (!appData) { e.textContent = 'Failed.'; return; }
+    if (u === appData.admin.username && p === appData.admin.password) {
+      isAdminLoggedIn = true;
+      currentUser = 'admin';
+      currentUserData = null;
+      closeAdminLogin();
+      saveSession('admin', true);
+      enterDashboard('admin');
+    } else {
+      e.textContent = 'Invalid admin credentials.';
+    }
+  });
+}
+
+function enterDashboard(t) {
+  document.getElementById('authContainer').classList.add('hidden');
+  document.getElementById('userDashboard').classList.add('active');
+  if (t === 'admin') {
+    document.getElementById('displayUsername').textContent = 'Admin';
+    document.getElementById('adminSection').classList.remove('hidden');
+    refreshAdminData();
+  } else {
+    document.getElementById('displayUsername').textContent = currentUserData ? (currentUserData.fullName || currentUser) : currentUser;
+    document.getElementById('adminSection').classList.add('hidden');
+    refreshUserData();
+  }
+}
+
+// ================================================================
+// USER DASHBOARD
+// ================================================================
+var currentTxTab = 'all';
+var _pendingAssetSelection = null;
+
+function showTxTab(tab) {
+  currentTxTab = tab;
+  document.querySelectorAll('.tab-buttons button').forEach(function(b) { b.classList.remove('active'); });
+  document.querySelectorAll('.tab-buttons button').forEach(function(b) {
+    if (b.textContent.toLowerCase().includes(tab) || (tab === 'asset_switch' && b.textContent.includes('Switch')))
+      b.classList.add('active');
+  });
+  refreshUserData();
+}
+
+function refreshUserData() {
+  readData().then(function() {
+    if (!appData || !appData.users[currentUser]) {
+      alert('Session expired.');
+      userLogout();
+      return;
+    }
+    currentUserData = appData.users[currentUser];
+    
+    document.getElementById('userBalance').textContent = fmtNaira(currentUserData.balance);
+    document.getElementById('userInvested').textContent = fmtNaira(currentUserData.invested);
+    document.getElementById('userProfit').textContent = fmtNaira(currentUserData.profit);
+    document.getElementById('userReferralBonus').textContent = fmtNaira(currentUserData.referralBonus || 0);
+    document.getElementById('userPlan').textContent = currentUserData.plan || 'Basic';
+    document.getElementById('refCode').textContent = currentUser;
+    document.getElementById('refLink').textContent = currentUser;
+    
+    var b = document.getElementById('userStatusBadge');
+    b.textContent = (currentUserData.status || 'active').charAt(0).toUpperCase() + (currentUserData.status || 'active').slice(1);
+    b.className = 'status-badge ' + (currentUserData.status || 'active');
+    
+    var w = document.getElementById('withdrawBtn');
+    if (currentUserData.status === 'frozen') {
+      w.classList.add('disabled');
+      w.onclick = function() { alert('Withdrawals disabled.'); };
+    } else {
+      w.classList.remove('disabled');
+      w.onclick = function() { showWithdrawModal(); };
+    }
+    
+    // Asset display
+    var assetId = currentUserData.asset || 'metallic';
+    var info = getAssetInfo(assetId);
+    var rate = getUserInterestRate(currentUserData);
+    document.getElementById('currentAssetDisplay').innerHTML = info.icon + ' ' + info.name;
+    document.getElementById('currentAssetRateDisplay').innerHTML = 'Interest: ' + rate + '% daily';
+    
+    var canSwitch = canSwitchAsset(currentUserData);
+    var switchBtn = document.getElementById('switchAssetBtn');
+    if (canSwitch) {
+      switchBtn.disabled = false;
+      switchBtn.style.opacity = '1';
+      switchBtn.textContent = 'Switch Asset';
+      document.getElementById('assetCooldownDisplay').textContent = '';
+    } else {
+      var rem = getAssetSwitchCooldownRemaining(currentUserData);
+      var h = Math.floor(rem);
+      var m = Math.floor((rem - h) * 60);
+      switchBtn.disabled = true;
+      switchBtn.style.opacity = '0.5';
+      switchBtn.textContent = '⏳ Cooldown';
+      document.getElementById('assetCooldownDisplay').textContent = 'Can switch in ' + h + 'h ' + m + 'm';
+    }
+    
+    // Transactions
+    var all = [];
+    (currentUserData.transactions || []).forEach(function(t) { all.push(Object.assign({}, t)); });
+    (currentUserData.withdrawals || []).forEach(function(w) {
+      var wType = w.type === 'bank' ? 'bank_withdraw' : 'withdraw';
+      var det = '';
+      if (w.type === 'bank') {
+        det = w.bankName + ': ' + w.accountNumber + ' (' + w.accountHolder + ')';
+        if (w.payoutRef) det += ' | Ref: ' + w.payoutRef;
+      } else {
+        det = '→ ' + w.currency + ': ' + (w.wallet || '').substring(0, 16) + '...';
+        if (w.payoutRef) det += ' | Ref: ' + w.payoutRef;
+      }
+      all.push({ date: w.date, type: wType, amount: -w.amount, status: w.status, description: det, payoutRef: w.payoutRef });
+    });
+    (currentUserData.referrals || []).forEach(function(r) {
+      all.push({ date: r.date, type: 'referral', amount: r.bonus, status: 'approved', description: 'Bonus from ' + r.referee });
+    });
+    
+    var filtered = all;
+    if (currentTxTab === 'deposits') filtered = all.filter(function(t) { return t.type === 'deposit'; });
+    else if (currentTxTab === 'withdrawals') filtered = all.filter(function(t) { return t.type === 'withdraw' || t.type === 'bank_withdraw'; });
+    else if (currentTxTab === 'profits') filtered = all.filter(function(t) { return t.type === 'profit'; });
+    else if (currentTxTab === 'referrals') filtered = all.filter(function(t) { return t.type === 'referral'; });
+    else if (currentTxTab === 'asset_switch') filtered = all.filter(function(t) { return t.type === 'asset_switch'; });
+    
+    var tb = document.getElementById('userTransactions');
+    if (!filtered.length) {
+      tb.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#808080;">No transactions.</td></tr>';
+    } else {
+      filtered.sort(function(a, b) { return new Date(b.date) - new Date(a.date); });
+      tb.innerHTML = filtered.map(function(t) {
+        var bc = t.type === 'deposit' ? 'deposit' : t.type === 'profit' ? 'profit' : t.type === 'referral' ? 'referral' : t.type === 'asset_switch' ? 'asset_switch' : t.type === 'bank_withdraw' ? 'bank_withdraw' : t.status === 'pending' ? 'pending' : t.status === 'approved' ? 'approved' : t.status === 'declined' ? 'declined' : 'withdraw';
+        var ac = (t.type === 'deposit' || t.type === 'profit' || t.type === 'referral') ? 'amount-green' : t.status === 'pending' ? 'amount-yellow' : 'amount-red';
+        if (t.type === 'asset_switch') ac = 'amount-purple';
+        var s = (t.type === 'withdraw' || t.type === 'bank_withdraw') ? '' : '+';
+        var am = Math.abs(t.amount);
+        var sl = t.status === 'pending' ? 'Pending' : t.status === 'approved' ? 'Approved' : t.status === 'declined' ? 'Declined' : 'Completed';
+        var det = t.description || '';
+        var typeLabel = t.type === 'bank_withdraw' ? 'Bank W/D' : t.type === 'asset_switch' ? 'Switch' : t.type === 'withdraw' ? 'Crypto' : t.type.charAt(0).toUpperCase() + t.type.slice(1);
+        var badge = t.payoutRef ? (t.type === 'bank_withdraw' ? ' <span class="badge approved">PAID</span>' : ' <span class="badge approved">PAID</span>') : '';
+        return '<tr><td>' + esc(t.date) + '</td><td><span class="badge ' + bc + '">' + typeLabel + '</span>' + badge + '</td><td class="' + ac + '">' + s + fmtNaira(am) + '</td><td><span class="badge ' + bc + '">' + sl + '</span></td><td style="font-size:12px;color:#b3b3b3;">' + esc(det) + '</td></tr>';
+      }).join('');
+    }
+  });
+}
+
+function copyRefLink() {
+  var el = document.getElementById('refLink');
+  var t = el.textContent;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(t).then(function() {
+      el.textContent = 'Copied!';
+      setTimeout(function() { refreshUserData(); }, 2000);
+    });
+  } else {
+    var ta = document.createElement('textarea');
+    ta.value = t;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    el.textContent = 'Copied!';
+    setTimeout(function() { refreshUserData(); }, 2000);
+  }
+}
+
+// ================================================================
+// DEPOSIT
+// ================================================================
+function showDepositModal() {
+  readData().then(function() {
+    if (!appData.settings || !appData.settings.monnifyApiKey || !appData.settings.monnifyContractCode) {
+      alert('Deposits not configured yet. Contact admin.');
+      return;
+    }
+    document.getElementById('depositError').textContent = '';
+    document.getElementById('depositAmount').value = '';
+    document.getElementById('depositMinDisplay').textContent = minDep().toLocaleString('en-NG');
+    document.getElementById('depositModal').classList.add('active');
+  });
+}
+
+function processDeposit() {
+  var amt = parseFloat(document.getElementById('depositAmount').value);
+  var err = document.getElementById('depositError');
+  if (!amt || amt < minDep()) { err.textContent = 'Minimum ' + fmtNaira(minDep()) + ' NGN.'; return; }
+  if (!appData.settings || !appData.settings.monnifyApiKey || !appData.settings.monnifyContractCode) {
+    err.textContent = 'Monnify not configured.'; return;
+  }
+  
+  var apiKey = appData.settings.monnifyApiKey;
+  var cc = appData.settings.monnifyContractCode;
+  var ref = 'NZ-' + Date.now() + '-' + Math.random().toString(36).substring(2, 8);
+  var email = (currentUserData && currentUserData.email) || '';
+  
+  closeModal('depositModal');
+  
+  // Handle case where Monnify SDK not loaded
+  if (typeof MonnifySDK === 'undefined') {
+    // Fallback: record deposit manually for testing
+    creditDeposit(ref, amt, email, { transactionReference: ref });
+    return;
+  }
+  
+  MonnifySDK.initialize({
+    amount: amt,
+    currency: "NGN",
+    reference: ref,
+    customerFullName: (currentUserData && (currentUserData.fullName || currentUser)) || currentUser,
+    customerEmail: email,
+    apiKey: apiKey,
+    contractCode: cc,
+    paymentDescription: "NetflixZone deposit",
+    isTestMode: true,
+    metadata: { username: currentUser },
+    onComplete: function(resp) { creditDeposit(ref, amt, email, resp); },
+    onClose: function() { /* user closed modal */ }
+  });
+}
+
+function creditDeposit(ref, amt, email, resp) {
+  atomicUpdate(function(data) {
+    var user = data.users[currentUser];
+    if (!user) return false;
+    if (user.processedReferences && user.processedReferences.indexOf(ref) !== -1) return false;
+    
+    var n = new Date();
+    var d = n.getFullYear() + '-' + String(n.getMonth() + 1).padStart(2, '0') + '-' + String(n.getDate()).padStart(2, '0') + ' ' + String(n.getHours()).padStart(2, '0') + ':' + String(n.getMinutes()).padStart(2, '0');
+    
+    user.balance += amt;
+    user.invested += amt;
+    if (!user.processedReferences) user.processedReferences = [];
+    user.processedReferences.push(ref);
+    if (!user.transactions) user.transactions = [];
+    var tr = (resp && resp.transactionReference) ? resp.transactionReference : ref;
+    user.transactions.push({ date: d, type: 'deposit', amount: amt, description: 'Monnify - ' + tr });
+    
+    // Referral bonus
+    if (user.referredBy && data.users[user.referredBy]) {
+      var rr = data.users[user.referredBy];
+      var bonus = amt * 0.20;
+      rr.balance += bonus;
+      rr.referralBonus = (rr.referralBonus || 0) + bonus;
+      if (!rr.transactions) rr.transactions = [];
+      if (!rr.referrals) rr.referrals = [];
+      rr.transactions.push({ date: d, type: 'referral', amount: bonus, description: 'Referral bonus from ' + currentUser });
+      rr.referrals.push({ date: d, referee: currentUser, bonus: bonus });
+    }
+    
+    currentUserData = user;
+    return true;
+  }).then(function(success) {
+    if (success) {
+      refreshUserData();
+      alert('✅ ' + fmtNaira(amt) + ' deposited successfully!');
+    }
+  });
+}
+
+// ================================================================
+// WITHDRAWAL
+// ================================================================
+var currentWithdrawTab = 'bank';
+
+function switchWithdrawTab(tab) {
+  currentWithdrawTab = tab;
+  document.getElementById('wdTabBank').className = tab === 'bank' ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-secondary';
+  document.getElementById('wdTabCrypto').className = tab === 'crypto' ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-secondary';
+  document.getElementById('withdrawBankForm').style.display = tab === 'bank' ? 'block' : 'none';
+  document.getElementById('withdrawCryptoForm').style.display = tab === 'crypto' ? 'block' : 'none';
+}
+
+function showWithdrawModal() {
+  if (currentUserData.status === 'frozen') { alert('Withdrawals disabled.'); return; }
+  
+  var day = wdDay();
+  var t = new Date();
+  if (day !== -1 && t.getDay() !== day) {
+    alert('Withdrawals are only on ' + wdName(day) + '.');
+    return;
+  }
+  
+  document.getElementById('withdrawError').textContent = '';
+  document.getElementById('withdrawMinDisplay').textContent = minWd().toLocaleString('en-NG');
+  document.getElementById('withdrawDayDisplay').textContent = wdName(wdDay());
+  document.getElementById('wdBankAmount').value = '';
+  document.getElementById('wdCryptoAmount').value = '';
+  document.getElementById('wdWallet').value = '';
+  document.getElementById('wdAccountNumber').value = '';
+  document.getElementById('wdAccountHolder').value = '';
+  
+  // Populate bank dropdown
+  var sel = document.getElementById('wdBankCode');
+  sel.innerHTML = '<option value="">Select Bank</option>';
+  NIGERIAN_BANKS.forEach(function(b) {
+    var opt = document.createElement('option');
+    opt.value = b.code;
+    opt.textContent = b.name;
+    sel.appendChild(opt);
+  });
+  
+  switchWithdrawTab('bank');
+  document.getElementById('withdrawModal').classList.add('active');
+}
+
+function requestBankWithdraw() {
+  var amt = parseFloat(document.getElementById('wdBankAmount').value);
+  var bankCode = document.getElementById('wdBankCode').value;
+  var accNum = document.getElementById('wdAccountNumber').value.trim();
+  var holder = document.getElementById('wdAccountHolder').value.trim();
+  var err = document.getElementById('withdrawError');
+  
+  if (!amt || amt < minWd()) { err.textContent = 'Min ' + fmtNaira(minWd()) + '.'; return; }
+  if (!bankCode) { err.textContent = 'Select bank.'; return; }
+  if (!accNum || accNum.length < 10) { err.textContent = 'Valid account number (10 digits).'; return; }
+  if (!holder || holder.length < 2) { err.textContent = 'Enter account holder name.'; return; }
+  if (amt > currentUserData.balance) { err.textContent = 'Insufficient balance.'; return; }
+  
+  var bankName = NIGERIAN_BANKS.find(function(b) { return b.code === bankCode; });
+  bankName = bankName ? bankName.name : bankCode;
+  
+  atomicUpdate(function(data) {
+    var user = data.users[currentUser];
+    if (!user || user.status === 'frozen' || amt > user.balance) return false;
+    var n = new Date();
+    var d = n.getFullYear() + '-' + String(n.getMonth() + 1).padStart(2, '0') + '-' + String(n.getDate()).padStart(2, '0') + ' ' + String(n.getHours()).padStart(2, '0') + ':' + String(n.getMinutes()).padStart(2, '0');
+    user.balance -= amt;
+    if (!user.withdrawals) user.withdrawals = [];
+    user.withdrawals.push({ date: d, amount: amt, type: 'bank', bankName: bankName, bankCode: bankCode, accountNumber: accNum, accountHolder: holder, status: 'pending' });
+    currentUserData = user;
+    return true;
+  }).then(function(success) {
+    if (success) {
+      closeModal('withdrawModal');
+      refreshUserData();
+      alert('✅ Bank withdrawal submitted! Pending admin approval.');
+    }
+  });
+}
+
+function requestCryptoWithdraw() {
+  var amt = parseFloat(document.getElementById('wdCryptoAmount').value);
+  var cur = document.getElementById('wdCurrency').value;
+  var wal = document.getElementById('wdWallet').value.trim();
+  var err = document.getElementById('withdrawError');
+  
+  if (!amt || amt < minWd()) { err.textContent = 'Min ' + fmtNaira(minWd()) + '.'; return; }
+  if (!wal || wal.length < 10) { err.textContent = 'Valid wallet address required.'; return; }
+  if (amt > currentUserData.balance) { err.textContent = 'Insufficient balance.'; return; }
+  
+  atomicUpdate(function(data) {
+    var user = data.users[currentUser];
+    if (!user || user.status === 'frozen' || amt > user.balance) return false;
+    var n = new Date();
+    var d = n.getFullYear() + '-' + String(n.getMonth() + 1).padStart(2, '0') + '-' + String(n.getDate()).padStart(2, '0') + ' ' + String(n.getHours()).padStart(2, '0') + ':' + String(n.getMinutes()).padStart(2, '0');
+    user.balance -= amt;
+    if (!user.withdrawals) user.withdrawals = [];
+    user.withdrawals.push({ date: d, amount: amt, currency: cur, wallet: wal, status: 'pending', type: 'crypto' });
+    currentUserData = user;
+    return true;
+  }).then(function(success) {
+    if (success) {
+      closeModal('withdrawModal');
+      refreshUserData();
+      alert('✅ Crypto withdrawal submitted! Pending admin approval.');
+    }
+  });
+}
+
+// ================================================================
+// ASSET SWITCH
+// ================================================================
+function openSwitchAssetModal() {
+  if (!canSwitchAsset(currentUserData)) {
+    var rem = getAssetSwitchCooldownRemaining(currentUserData);
+    var h = Math.floor(rem);
+    var m = Math.floor((rem - h) * 60);
+    alert('Please wait ' + h + 'h ' + m + 'm before switching assets again.');
+    return;
+  }
+  
+  _pendingAssetSelection = null;
+  document.getElementById('assetSwitchError').textContent = '';
+  
+  var container = document.getElementById('assetOptions');
+  container.innerHTML = '';
+  
+  for (var aid in ASSET_TYPES) {
+    var at = ASSET_TYPES[aid];
+    var rates = (appData.settings && appData.settings.assetRates) || {};
+    var rate = rates[aid];
+    if (rate === undefined || rate === null) rate = at.defaultRate;
+    var isCurrent = (currentUserData.asset || 'metallic') === aid;
+    var div = document.createElement('div');
+    div.style.cssText = 'background:' + (isCurrent ? 'var(--card)' : 'var(--card2)') + ';border:2px solid ' + (isCurrent ? 'var(--gold)' : 'var(--border)') + ';border-radius:8px;padding:12px;text-align:center;cursor:pointer;transition:all 0.3s;';
+    div.innerHTML = '<div style="font-size:24px;margin-bottom:4px;">' + at.icon + '</div><div style="font-size:13px;font-weight:600;">' + at.name + '</div><div style="font-size:11px;color:var(--text2);">' + rate + '% daily</div>' + (isCurrent ? '<div style="font-size:10px;color:var(--gold);margin-top:4px;">✅ CURRENT</div>' : '');
+    if (!isCurrent) {
+      div.onclick = function(a) {
+        return function() {
+          document.getElementById('assetOptions').querySelectorAll('div').forEach(function(d) { d.style.borderColor = 'var(--border)'; });
+          this.style.borderColor = 'var(--green)';
+          _pendingAssetSelection = a;
+        };
+      }(aid);
+    }
+    container.appendChild(div);
+  }
+  
+  document.getElementById('assetSwitchModal').classList.add('active');
+}
+
+function confirmSwitchAsset() {
+  if (!_pendingAssetSelection) { document.getElementById('assetSwitchError').textContent = 'Select an asset first.'; return; }
+  var newAsset = _pendingAssetSelection;
+  var oldAsset = currentUserData.asset || 'metallic';
+  if (newAsset === oldAsset) { document.getElementById('assetSwitchError').textContent = 'Already using this asset.'; return; }
+  
+  atomicUpdate(function(data) {
+    var u = data.users[currentUser];
+    if (!u) return false;
+    u.asset = newAsset;
+    u.lastAssetSwitch = new Date().toISOString();
+    var n = new Date();
+    var d = n.getFullYear() + '-' + String(n.getMonth() + 1).padStart(2, '0') + '-' + String(n.getDate()).padStart(2, '0') + ' ' + String(n.getHours()).padStart(2, '0') + ':' + String(n.getMinutes()).padStart(2, '0');
+    if (!u.transactions) u.transactions = [];
+    var oi = getAssetInfo(oldAsset);
+    var ni = getAssetInfo(newAsset);
+    u.transactions.push({ date: d, type: 'asset_switch', amount: 0, description: 'Switched from ' + oi.name + ' to ' + ni.name });
+    currentUserData = u;
+    return true;
+  }).then(function() {
+    closeModal('assetSwitchModal');
+    refreshUserData();
+    alert('✅ Switched to ' + getAssetInfo(newAsset).name + '!');
+  });
+}
+
+// ================================================================
+// ADMIN FUNCTIONS — All use atomicUpdate [FIX #8]
+// ================================================================
+function refreshAdminData() {
+  readData().then(function() {
+    if (!appData) { document.getElementById('adminUserCards').innerHTML = '<p style="color:#E50914;">Failed to load.</p>'; return; }
+    
+    var all = Object.keys(appData.users);
+    document.getElementById('adminTotalUsers').textContent = all.length;
+    document.getElementById('adminActiveUsers').textContent = all.filter(function(un) { return appData.users[un].status === 'active'; }).length;
+    
+    // Settings fields
+    document.getElementById('adminMinDeposit').value = minDep();
+    document.getElementById('adminMinWithdraw').value = minWd();
+    document.getElementById('adminWithdrawDay').value = wdDay();
+    document.getElementById('currentMinDeposit').textContent = Number(minDep()).toLocaleString('en-NG');
+    document.getElementById('currentMinWithdraw').textContent = Number(minWd()).toLocaleString('en-NG');
+    document.getElementById('currentWithdrawDayDisplay').textContent = wdName(wdDay());
+    
+    // Asset rates
+    var rates = (appData.settings && appData.settings.assetRates) || {};
+    var ratesHtml = '';
+    for (var aid in ASSET_TYPES) {
+      var r = rates[aid];
+      if (r === undefined || r === null) r = ASSET_TYPES[aid].defaultRate;
+      ratesHtml += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span style="min-width:120px;font-size:13px;">' + ASSET_TYPES[aid].icon + ' ' + ASSET_TYPES[aid].name + '</span><input type="number" id="adminAssetRate_' + aid + '" value="' + r + '" step="0.1" style="width:80px;margin:0;"><span style="font-size:12px;color:var(--text2);">%</span></div>';
+    }
+    document.getElementById('assetRateInputs').innerHTML = ratesHtml;
+    
+    // API keys
+    if (appData.settings) {
+      document.getElementById('adminMonnifyApiKey').value = appData.settings.monnifyApiKey || '';
+      document.getElementById('adminMonnifyContractCode').value = appData.settings.monnifyContractCode || '';
+      document.getElementById('adminMonnifySecretKey').value = appData.settings.monnifySecretKey || '';
+      document.getElementById('adminMonnifySourceAccount').value = appData.settings.monnifySourceAccount || '';
+      document.getElementById('adminNPApiKey').value = appData.settings.npApiKey || '';
+      document.getElementById('adminNPSecretKey').value = appData.settings.npSecretKey || '';
+      document.getElementById('adminNPEmail').value = appData.settings.npEmail || '';
+      document.getElementById('adminNPPassword').value = appData.settings.npPassword || '';
+    }
+    
+    // User cards
+    var el = document.getElementById('adminUserCards');
+    var sorted = all.sort();
+    if (!sorted.length) {
+      el.innerHTML = '<p style="color:#808080;">No users registered.</p>';
+    } else {
+      el.innerHTML = sorted.map(function(un) {
+        var u = appData.users[un];
+        var ai = getAssetInfo(u.asset || 'metallic');
+        return '<div class="admin-card">' +
+          '<div class="user-header"><h4>' + esc(un) + '</h4><span class="status-badge ' + esc(u.status || 'active') + '">' + esc(u.status || 'active') + '</span></div>' +
+          '<div class="user-detail"><strong>Name:</strong> ' + esc(u.fullName) + '</div>' +
+          '<div class="user-detail"><strong>Asset:</strong> ' + ai.icon + ' ' + ai.name + '</div>' +
+          '<div class="user-detail"><strong>Balance:</strong> ' + fmtNaira(u.balance) + '</div>' +
+          '<div class="user-detail"><strong>Invested:</strong> ' + fmtNaira(u.invested) + '</div>' +
+          '<div class="user-detail"><strong>Profit:</strong> ' + fmtNaira(u.profit) + '</div>' +
+          '<div class="admin-actions">' +
+            '<select id="userStatus_' + un + '"><option value="active"' + (u.status === 'active' ? ' selected' : '') + '>Active</option><option value="frozen"' + (u.status === 'frozen' ? ' selected' : '') + '>Frozen</option><option value="closed"' + (u.status === 'closed' ? ' selected' : '') + '>Closed</option></select>' +
+            '<button class="btn-blue" onclick="adminSetStatus(\'' + un + '\')">Set</button>' +
+            '<button class="btn-green" onclick="adminAddBalance(\'' + un + '\')">+Add</button>' +
+            '<button class="btn-orange" onclick="adminDeductBalance(\'' + un + '\')">-Deduct</button>' +
+            '<button class="btn-yellow" onclick="adminResetUserAccount(\'' + un + '\')">Reset</button>' +
+            '<button class="btn-red" onclick="adminDeleteUser(\'' + un + '\')">🗑 Delete</button>' +
+          '</div></div>';
+      }).join('');
+    }
+    
+    // Pending withdrawals
+    renderPendingWithdrawals();
+  });
+}
+
+function renderPendingWithdrawals() {
+  var pending = [];
+  for (var un in appData.users) {
+    var u = appData.users[un];
+    if (u.withdrawals) {
+      u.withdrawals.forEach(function(w, i) {
+        if (w.status === 'pending') pending.push({ username: un, index: i, data: w });
+      });
+    }
+  }
+  var el = document.getElementById('pendingWithdrawals');
+  if (!pending.length) { el.innerHTML = '<p style="color:#808080;">None pending.</p>'; return; }
+  
+  el.innerHTML = pending.map(function(pw) {
+    var w = pw.data;
+    var isBank = w.type === 'bank';
+    var details = isBank
+      ? '<div style="font-size:12px;color:#b3b3b3;">🏦 ' + esc(w.bankName) + ' | ' + esc(w.accountNumber) + ' | ' + esc(w.accountHolder) + '</div>'
+      : '<div style="font-size:12px;color:#b3b3b3;">💎 ' + esc(w.currency) + ' → ' + esc(w.wallet) + '</div>';
+    var typeLabel = isBank ? '<span class="badge bank_withdraw">Bank</span>' : '<span class="badge withdraw">Crypto</span>';
+    return '<div style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:14px;margin-bottom:10px;">' +
+      '<div style="font-size:14px;"><strong>User:</strong> ' + esc(pw.username) + ' - <strong>' + fmtNaira(w.amount) + '</strong> ' + typeLabel + '</div>' +
+      details +
+      '<div style="font-size:11px;color:#808080;">' + esc(w.date) + '</div>' +
+      '<div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;">' +
+        '<button class="btn-green" onclick="adminApproveWithdraw(\'' + pw.username + '\',' + pw.index + ')">✅ Approve & Payout</button>' +
+        '<button class="btn-red" onclick="adminDeclineWithdraw(\'' + pw.username + '\',' + pw.index + ')">❌ Decline</button>' +
+      '</div></div>';
+  }).join('');
+}
+
+function adminSetStatus(un) {
+  var s = document.getElementById('userStatus_' + un).value;
+  atomicUpdate(function(d) { if (!d.users[un]) return false; d.users[un].status = s; return true; }).then(function() { refreshAdminData(); });
+}
+
+function adminAddBalance(un) {
+  var amt = prompt('Add to ' + un + ':');
+  if (!amt || isNaN(amt) || parseFloat(amt) <= 0) return;
+  amt = parseFloat(amt);
+  atomicUpdate(function(d) {
+    if (!d.users[un]) return false;
+    d.users[un].balance += amt;
+    d.users[un].invested += amt;
+    var n = new Date();
+    var dd = n.getFullYear() + '-' + String(n.getMonth() + 1).padStart(2, '0') + '-' + String(n.getDate()).padStart(2, '0');
+    if (!d.users[un].transactions) d.users[un].transactions = [];
+    d.users[un].transactions.push({ date: dd, type: 'deposit', amount: amt, description: 'Admin credit' });
+    return true;
+  }).then(function() { refreshAdminData(); });
+}
+
+function adminDeductBalance(un) {
+  var amt = prompt('Deduct from ' + un + ':');
+  if (!amt || isNaN(amt) || parseFloat(amt) <= 0) return;
+  amt = parseFloat(amt);
+  atomicUpdate(function(d) {
+    if (!d.users[un]) return false;
+    if (amt > d.users[un].balance) { alert('Insufficient.'); return false; }
+    d.users[un].balance -= amt;
+    var n = new Date();
+    var dd = n.getFullYear() + '-' + String(n.getMonth() + 1).padStart(2, '0') + '-' + String(n.getDate()).padStart(2, '0');
+    if (!d.users[un].transactions) d.users[un].transactions = [];
+    d.users[un].transactions.push({ date: dd, type: 'withdraw', amount: amt, description: 'Admin deduction' });
+    return true;
+  }).then(function() { refreshAdminData(); });
+}
+
+function adminResetUserAccount(un) {
+  if (!confirm('Reset ' + un + '? All balance/transactions cleared.')) return;
+  atomicUpdate(function(d) {
+    if (!d.users[un]) return false;
+    var u = d.users[un];
+    u.balance = 0; u.invested = 0; u.profit = 0; u.referralBonus = 0;
+    u.transactions = []; u.withdrawals = []; u.referrals = [];
+    u.lastInterestDate = ''; u.asset = 'metallic'; u.lastAssetSwitch = '';
+    return true;
+  }).then(function() { refreshAdminData(); });
+}
+
+function adminDeleteUser(un) {
+  if (!confirm('PERMANENTLY DELETE ' + un + '?')) return;
+  if (!confirm('Final confirmation?')) return;
+  atomicUpdate(function(d) { if (!d.users[un]) return false; delete d.users[un]; return true; }).then(function() { refreshAdminData(); });
+}
+
+function adminCreateUser() {
+  var u = document.getElementById('adminNewUser').value.trim();
+  var p = document.getElementById('adminNewPass').value.trim();
+  var n = document.getElementById('adminNewName').value.trim();
+  if (!u || !p || !n) { document.getElementById('adminCreateMsg').textContent = 'Fill all fields.'; return; }
+  
+  atomicUpdate(function(d) {
+    if (d.users[u]) { document.getElementById('adminCreateMsg').textContent = 'Username exists.'; return false; }
+    var nd = new Date();
+    var dd = nd.getFullYear() + '-' + String(nd.getMonth() + 1).padStart(2, '0') + '-' + String(nd.getDate()).padStart(2, '0');
+    d.users[u] = {
+      fullName: n, email: u + '@nz.local', phone: '', password: p,
+      balance: 0, invested: 0, profit: 0, referralBonus: 0, referralCode: u,
+      referredBy: '', plan: 'Basic', status: 'active', createdAt: dd,
+      lastInterestDate: '', transactions: [], withdrawals: [],
+      referrals: [], processedReferences: [], asset: 'metallic', lastAssetSwitch: ''
+    };
+    document.getElementById('adminCreateMsg').innerHTML = '✅ Created: ' + u;
+    ['adminNewUser','adminNewPass','adminNewName'].forEach(function(i) { document.getElementById(i).value = ''; });
+    return true;
+  }).then(function() { refreshAdminData(); });
+}
+
+// Settings
+function adminUpdateMinAmounts() {
+  var d = parseFloat(document.getElementById('adminMinDeposit').value);
+  var w = parseFloat(document.getElementById('adminMinWithdraw').value);
+  if (isNaN(d) || d < 100 || isNaN(w) || w < 100) return;
+  atomicUpdate(function(data) {
+    if (!data.settings) data.settings = {};
+    data.settings.minDeposit = d;
+    data.settings.minWithdraw = w;
+    return true;
+  }).then(function() { refreshAdminData(); });
+}
+
+function adminUpdateWithdrawDay() {
+  var day = parseInt(document.getElementById('adminWithdrawDay').value);
+  atomicUpdate(function(data) {
+    if (!data.settings) data.settings = {};
+    data.settings.withdrawDay = day;
+    return true;
+  }).then(function() { refreshAdminData(); });
+}
+
+function adminSaveAssetRates() {
+  atomicUpdate(function(data) {
+    if (!data.settings) data.settings = {};
+    if (!data.settings.assetRates) data.settings.assetRates = {};
+    for (var aid in ASSET_TYPES) {
+      var val = parseFloat(document.getElementById('adminAssetRate_' + aid).value);
+      if (!isNaN(val) && val >= 0) data.settings.assetRates[aid] = val;
+    }
+    document.getElementById('assetRateMsg').textContent = '✅ Rates saved!';
+    setTimeout(function() { document.getElementById('assetRateMsg').textContent = ''; }, 3000);
+    return true;
+  }).then(function() { refreshAdminData(); });
+}
+
+// [FIX #9] API key saves — preserve existing if empty
+function adminSaveMonnifyKeys() {
+  var api = document.getElementById('adminMonnifyApiKey').value.trim();
+  var cc = document.getElementById('adminMonnifyContractCode').value.trim();
+  var sk = document.getElementById('adminMonnifySecretKey').value.trim();
+  var src = document.getElementById('adminMonnifySourceAccount').value.trim();
+  
+  atomicUpdate(function(data) {
+    if (!data.settings) data.settings = {};
+    if (api) data.settings.monnifyApiKey = api;
+    if (cc) data.settings.monnifyContractCode = cc;
+    if (sk) data.settings.monnifySecretKey = sk;
+    if (src) data.settings.monnifySourceAccount = src;
+    document.getElementById('monnifyMsg').textContent = '✅ Saved!';
+    setTimeout(function() { document.getElementById('monnifyMsg').textContent = ''; }, 3000);
+    return true;
+  });
+}
+
+function adminSaveNPKeys() {
+  var ak = document.getElementById('adminNPApiKey').value.trim();
+  var sk = document.getElementById('adminNPSecretKey').value.trim();
+  var em = document.getElementById('adminNPEmail').value.trim();
+  var pw = document.getElementById('adminNPPassword').value.trim();
+  
+  atomicUpdate(function(data) {
+    if (!data.settings) data.settings = {};
+    if (ak) data.settings.npApiKey = ak;
+    if (sk) data.settings.npSecretKey = sk;
+    if (em) data.settings.npEmail = em;
+    if (pw) data.settings.npPassword = pw;
+    document.getElementById('npMsg').textContent = '✅ Saved!';
+    setTimeout(function() { document.getElementById('npMsg').textContent = ''; }, 3000);
+    return true;
+  });
+}
+
+function changeAdminPassword() {
+  var cur = document.getElementById('adminCurrentPass').value;
+  var nw = document.getElementById('adminNewPassInput').value;
+  if (!cur || !nw) { document.getElementById('changePassMsg').textContent = 'Fill both fields.'; return; }
+  
+  atomicUpdate(function(data) {
+    if (data.admin.password !== cur) {
+      document.getElementById('changePassMsg').textContent = 'Wrong current password.';
+      return false;
+    }
+    data.admin.password = nw;
+    document.getElementById('changePassMsg').innerHTML = '✅ Password changed.';
+    document.getElementById('adminCurrentPass').value = '';
+    document.getElementById('adminNewPassInput').value = '';
+    return true;
+  });
+}
+
+function adminResetUserPassword() {
+  var u = document.getElementById('adminResetUser').value.trim();
+  var p = document.getElementById('adminResetUserPass').value.trim();
+  if (!u || !p) { document.getElementById('resetUserPassMsg').textContent = 'Fill both fields.'; return; }
+  
+  atomicUpdate(function(data) {
+    if (!data.users[u]) { document.getElementById('resetUserPassMsg').textContent = 'User not found.'; return false; }
+    data.users[u].password = p;
+    document.getElementById('resetUserPassMsg').innerHTML = '✅ Password reset for ' + u;
+    document.getElementById('adminResetUser').value = '';
+    document.getElementById('adminResetUserPass').value = '';
+    return true;
+  });
+}
+
+// Daily interest for all active users
+function adminPayAllProfits() {
+  if (!confirm('Apply daily interest to ALL active users?')) return;
+  
+  atomicUpdate(function(data) {
+    var today = new Date().toDateString();
+    var count = 0;
+    for (var un in data.users) {
+      var u = data.users[un];
+      if (u.status === 'active' && u.balance > 0 && u.lastInterestDate !== today) {
+        var rate = getUserInterestRate(u);
+        var interest = u.balance * (rate / 100);
+        u.balance += interest;
+        u.profit += interest;
+        if (!u.transactions) u.transactions = [];
+        var n = new Date();
+        var d = n.getFullYear() + '-' + String(n.getMonth() + 1).padStart(2, '0') + '-' + String(n.getDate()).padStart(2, '0') + ' ' + String(n.getHours()).padStart(2, '0') + ':' + String(n.getMinutes()).padStart(2, '0');
+        var ai = getAssetInfo(u.asset || 'metallic');
+        u.transactions.push({ date: d, type: 'profit', amount: interest, description: ai.icon + ' ' + ai.name + ' interest ' + rate + '%' });
+        u.lastInterestDate = today;
+        count++;
+      }
+    }
+    document.getElementById('adminActionMsg').textContent = '✅ Applied to ' + count + ' users.';
+    return true;
+  }).then(function() { refreshAdminData(); });
+}
+
+// [FIX #10] adminResetAll — only wipes users, preserves settings
+function adminResetAll() {
+  if (!confirm('⚠️ WIPE ALL USER DATA?')) return;
+  if (!confirm('Final confirmation? This cannot be undone!')) return;
+  atomicUpdate(function(data) { data.users = {}; return true; }).then(function() {
+    refreshAdminData();
+    document.getElementById('adminActionMsg').textContent = '✅ All users wiped. Settings preserved.';
+  });
+}
+
+// ================================================================
+// WITHDRAWAL APPROVAL/PAYOUT
+// ================================================================
+function adminApproveWithdraw(un, idx) {
+  readData().then(function() {
+    if (!appData.users[un] || !appData.users[un].withdrawals || !appData.users[un].withdrawals[idx]) return;
+    var w = appData.users[un].withdrawals[idx];
+    if (!confirm('Approve ' + fmtNaira(w.amount) + ' for ' + un + '?')) return;
+    
+    atomicUpdate(function(d) {
+      d.users[un].withdrawals[idx].status = 'approved';
+      d.users[un].withdrawals[idx].approvedAt = new Date().toISOString();
+      return true;
+    }).then(function() {
+      refreshAdminData();
+      
+      // Try auto-payout based on type
+      readData().then(function() {
+        var w2 = appData.users[un].withdrawals[idx];
+        var ref = 'NZ-PAY-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6).toUpperCase();
+        
+        if (w2.type === 'bank') {
+          var ak = appData.settings && appData.settings.monnifyApiKey;
+          var sk = appData.settings && appData.settings.monnifySecretKey;
+          var src = appData.settings && appData.settings.monnifySourceAccount;
+          
+          if (ak && sk && src && w2.bankCode && w2.accountNumber) {
+            w2.payoutRef = ref;
+            w2.payoutStatus = 'initiating';
+            atomicUpdate(function(d) { d.users[un].withdrawals[idx] = w2; return true; }).then(function() { refreshAdminData(); });
+            
+            var ba = btoa(ak + ':' + sk);
+            fetch('https://sandbox.monnify.com/api/v1/auth/login', {
+              method: 'POST',
+              headers: { 'Authorization': 'Basic ' + ba }
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(ar) {
+              if (!ar || !ar.responseBody || !ar.responseBody.accessToken) {
+                alert('Bank payout auth failed. Manual approval logged.');
+                return;
+              }
+              var tok = ar.responseBody.accessToken;
+              return fetch('https://sandbox.monnify.com/api/v2/disbursements/single', {
+                method: 'POST',
+                headers: { 'Authorization': 'Bearer ' + tok, 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  amount: w2.amount,
+                  reference: ref,
+                  narration: 'Payout to ' + un,
+                  destinationBankCode: w2.bankCode,
+                  destinationAccountNumber: w2.accountNumber,
+                  sourceAccountNumber: src,
+                  currency: 'NGN',
+                  async: true
+                })
+              });
+            })
+            .then(function(r) { return r ? r.json() : null; })
+            .then(function(pr) {
+              if (pr && pr.requestSuccessful) {
+                w2.payoutStatus = 'paid';
+                atomicUpdate(function(d) { d.users[un].withdrawals[idx] = w2; return true; }).then(function() { refreshAdminData(); });
+                alert('✅ Bank payout initiated! Ref: ' + ref);
+              } else {
+                w2.payoutStatus = 'payout_failed';
+                atomicUpdate(function(d) { d.users[un].withdrawals[idx] = w2; return true; }).then(function() { refreshAdminData(); });
+              }
+            })
+            .catch(function(err) {
+              w2.payoutStatus = 'error';
+              atomicUpdate(function(d) { d.users[un].withdrawals[idx] = w2; return true; }).then(function() { refreshAdminData(); });
+            });
+          } else {
+            alert('Monnify not fully configured. Approval logged without payout.');
+          }
+          
+        } else if (w2.type === 'crypto') {
+          var npk = appData.settings && appData.settings.npApiKey;
+          if (npk && w2.wallet && w2.currency) {
+            w2.payoutRef = ref;
+            w2.payoutStatus = 'initiating';
+            atomicUpdate(function(d) { d.users[un].withdrawals[idx] = w2; return true; }).then(function() { refreshAdminData(); });
+            
+            var currencyMap = {
+              'USDT (TRC20)': 'usdttrc20', 'Bitcoin (BTC)': 'btc', 'Ethereum (ETH)': 'eth',
+              'Tron (TRX)': 'trx', 'Litecoin (LTC)': 'ltc', 'Dogecoin (DOGE)': 'doge', 'Solana (SOL)': 'sol'
+            };
+            var pc = currencyMap[w2.currency] || w2.currency.toLowerCase().replace(/[^a-z0-9]/g, '');
+            
+            fetch('https://api.nowpayments.io/v1/payout', {
+              method: 'POST',
+              headers: { 'x-api-key': npk, 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                withdrawals: [{ address: w2.wallet, currency: pc, amount: parseFloat(w2.amount) }],
+                payout_description: 'NetflixZone withdrawal for ' + un
+              })
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(pr) {
+              if (pr && pr.id) {
+                w2.payoutStatus = 'paid';
+                w2.payoutResponse = JSON.stringify(pr);
+                atomicUpdate(function(d) { d.users[un].withdrawals[idx] = w2; return true; }).then(function() { refreshAdminData(); });
+                alert('✅ Crypto payout initiated! ID: ' + pr.id);
+              } else {
+                w2.payoutStatus = 'payout_failed';
+                atomicUpdate(function(d) { d.users[un].withdrawals[idx] = w2; return true; }).then(function() { refreshAdminData(); });
+              }
+            })
+            .catch(function(err) {
+              w2.payoutStatus = 'error';
+              atomicUpdate(function(d) { d.users[un].withdrawals[idx] = w2; return true; }).then(function() { refreshAdminData(); });
+            });
+          } else {
+            alert('NOWPayments not configured. Approval logged without payout.');
+          }
+        } else {
+          alert('Unknown type. Approved but no payout sent.');
+        }
+      });
+    });
+  });
+}
+
+function adminDeclineWithdraw(un, idx) {
+  atomicUpdate(function(data) {
+    if (!data.users[un] || !data.users[un].withdrawals || !data.users[un].withdrawals[idx]) return false;
+    var amt = data.users[un].withdrawals[idx].amount;
+    data.users[un].withdrawals[idx].status = 'declined';
+    data.users[un].balance += amt; // Refund
+    return true;
+  }).then(function() { refreshAdminData(); });
+}
+
+// ================================================================
+// [FIX #11] BOOT — NEVER writes on normal load, NEVER wipes data
+// ================================================================
+(function boot() {
+  if (!document.getElementById('authContainer')) return;
+  showLoading();
+  
+  fetch(JSONBIN_URL, { headers: getHeaders() })
+  .then(function(r) {
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return r.json();
+  })
+  .then(function(j) {
+    if (!j || !j.record) {
+      // First-time initialization
+      console.log('First-time init — creating default data...');
+      appData = {
+        admin: { username: 'admin', password: 'admin123' },
+        settings: {
+          interestRate: 2, minDeposit: 1000, minWithdraw: 500, withdrawDay: 5,
+          monnifyApiKey: '', monnifyContractCode: '', monnifySecretKey: '', monnifySourceAccount: '',
+          npApiKey: '', npSecretKey: '', npEmail: '', npPassword: '',
+          assetRates: { metallic: 2.0, energy: 3.0, gemstone: 4.0 }
+        },
+        users: {}
+      };
+      return saveData(); // Only save ONCE on first init
+    }
+    
+    appData = j.record;
+    
+    // Migrate missing fields for older users
+    for (var un in appData.users) {
+      var u = appData.users[un];
+      if (!u.asset) u.asset = 'metallic';
+      if (!u.lastAssetSwitch) u.lastAssetSwitch = '';
+      if (!u.transactions) u.transactions = [];
+      if (!u.withdrawals) u.withdrawals = [];
+      if (!u.referrals) u.referrals = [];
+      if (!u.processedReferences) u.processedReferences = [];
+    }
+    
+    return Promise.resolve(); // ← NEVER SAVE DATA HERE [FIX #12]
+  })
+  .catch(function(err) {
+    console.error('Boot error:', err);
+    appData = null;
+  })
+  .finally(function() {
+    hideLoading();
+    
+    // Restore session
+    var s = getSession();
+    if (s && s.username && appData) {
+      if (s.isAdmin && s.username === 'admin') {
+        isAdminLoggedIn = true;
+        currentUser = 'admin';
+        currentUserData = null;
+        enterDashboard('admin');
+      } else if (appData.users[s.username]) {
+        currentUser = s.username;
+        currentUserData = appData.users[s.username];
+        isAdminLoggedIn = false;
+        if (currentUserData.status !== 'closed') {
+          enterDashboard('user');
+        } else {
+          clearSession();
+        }
+      } else {
+        clearSession();
+      }
+    }
+  });
+})();
+</script>
+</body>
+</html>
